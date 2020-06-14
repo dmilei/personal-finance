@@ -1,0 +1,75 @@
+version: '3.7'
+
+networks:
+  personal-finance:
+    name: personal-finance
+
+services:
+
+  #MySQL Service
+  api-db:
+    image: mysql:5.7
+    container_name: api-db
+    restart: unless-stopped
+    ports:
+      - "6606:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: laravel
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=laravel --password=laravel --execute \"SHOW DATABASES;\""
+      interval: 3s
+      timeout: 2s
+      retries: 5
+    volumes:
+      - ./build/api/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - personal-finance
+
+  #PHP Service
+  api-app:
+    build:
+      context: .
+      dockerfile: build/api/Dockerfile
+      target: local
+    depends_on:
+      - api-db
+    container_name: api-app
+    image: api-app:latest
+    restart: unless-stopped
+    ports:
+      - "6000:6000"
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./api:/var/www
+    networks:
+      - personal-finance
+
+  # node service
+  dashboard:
+    build:
+      context: .
+      dockerfile: build/dashboard/Dockerfile
+      target: local
+    container_name: dashboard
+    env_file:
+      - dashboard/.env
+    restart: unless-stopped
+    depends_on:
+      - api-app
+    ports:
+      - "6001:6001"
+    command: sh -c "npm install && npm rebuild node-sass && npm run dev"
+    working_dir: /usr/src/dashboard
+    volumes:
+      - ./dashboard:/usr/src/dashboard
+    networks:
+      - personal-finance
+
