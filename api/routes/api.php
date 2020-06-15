@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +21,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::prefix('api/')
     ->name('api.')
     ->group(function () {
+
         /* transactions */
         Route::get('transactions', 'TransactionController@index')
             ->name('transactions.index');

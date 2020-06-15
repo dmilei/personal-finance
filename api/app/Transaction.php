@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 
 class Transaction extends Model
 {
@@ -25,5 +26,10 @@ class Transaction extends Model
     public function addSubcategory(TransactionCategory $subcategory): bool
     {
         return $this->subcategory()->associate($subcategory)->save();
+    }
+
+    public function scopeUserTransactions($query)
+    {
+        return $query->where('user_id', '=', Auth::user()->id);
     }
 }
