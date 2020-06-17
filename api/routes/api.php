@@ -22,7 +22,11 @@ Route::prefix('api/')
     ->name('api.')
     ->group(function () {
 
-        /* transactions */
-        Route::get('transactions', 'TransactionController@index')
-            ->name('transactions.index');
+
+        Route::middleware(['auth:api'])->group(function () {
+
+            /* transactions */
+            Route::get('transactions', 'TransactionController@index')
+                ->name('transactions.index');
+        });
     });
