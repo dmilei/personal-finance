@@ -22,8 +22,13 @@ Route::prefix('api/')
     ->name('api.')
     ->group(function () {
 
+        Route::post('users/login', 'Auth\LoginController@login')
+            ->name('users.login');
 
         Route::middleware(['auth:api'])->group(function () {
+            /* auth */
+            Route::get('/users/logout', 'Auth\LoginController@logout')
+                ->name('users.logout');
 
             /* transactions */
             Route::get('transactions', 'TransactionController@index')
